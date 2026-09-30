@@ -36,4 +36,47 @@
 
 #include "interface.h"
 
+template <typename K, typename V>
+class CoarseMap{
+    private:
+        std::map<K,V> map_;
+        mutable std::mutex mutex_;
+    
+    public:
+        bool insert(const K& key, const V& value){
+            std::lock_guard<std::mutex> guard(mutex_);
+            auto [it, inserted] = map_.insert({key, value});
+            it->second = value;
+            return inserted;
+        };   // true if key was new
+
+        bool find  (const K& key, V& out) const{
+            std::lock_guard<std::mutex> guard(mutex_);
+
+            auto it = map_.find(key);
+
+            if(it == map_.end()){
+                return false;
+            }
+
+            out = it->second;
+            return true;
+
+        };     // copy out; false if absent
+        bool erase (const K& key){
+            std::lock_guard<std::mutex> guard(mutex_);
+
+            if (map_.erase(key)){
+                return true;
+            }
+            return false;
+
+        };                   // true if it was present
+        std::size_t size() const{
+            std::lock_guard<std::mutex> guard(mutex_);
+            return map_.size();
+        };
+};
+
+
 #endif /* CONCURRENT_MAP_H */
