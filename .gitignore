@@ -1,2 +1,28 @@
-._*
+# macOS metadata
 .DS_Store
+._*
+
+# Build artifacts
+*.o
+*.out
+*.exe
+*.a
+*.so
+
+# Common build directories
+build/
+bin/
+
+# Sanitizer / profiling junk
+*.gcda
+*.gcno
+*.gcov
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Generated benchmark outputs, ONLY if you don't want them committed
+# *.csv
