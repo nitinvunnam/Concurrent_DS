@@ -35,4 +35,41 @@
 
 #include "interface.h"
 
+class TASLock{
+    public:
+        void lock(){
+            while(locked_.exchange(true)){
+                continue;
+            }
+        };
+        void unlock(){
+            locked_.store(false);
+        };
+    private:
+        std::atomic<bool> locked_{false};
+};
+
+class TTASLock{
+    public:
+    void lock(){
+        while(true){
+            while(locked_.load()){
+                continue;
+            }
+            bool result = locked_.exchange(true);
+
+            if(!result){
+                break;
+            }
+        }
+    };
+    void unlock(){
+        locked_.store(false);
+    };
+
+    private:
+        std::atomic <bool> locked_{false};
+};
+
+
 #endif /* LOCKS_H */
