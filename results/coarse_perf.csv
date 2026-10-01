@@ -1,0 +1,4 @@
+threads,mops_per_s,cycles_per_op,instructions_per_op,ipc,l1_misses_per_op,llc_misses_per_op,hitm_per_op,context_switches_per_op
+1,2.1,1172,254.9,0.218,28.97,1.053,0.0002625,0.0000006755
+8,0.7,14020,3692,0.263,112,21.8,9.368,0.4282
+28,0.7,75680,8650,0.114,124.5,27.08,12.49,0.4028

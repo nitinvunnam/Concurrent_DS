@@ -1,0 +1,2 @@
+cycles/op growth: 11.96245733788396
+L1 misses/op growth: 3.8660683465654127
