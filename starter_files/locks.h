@@ -52,15 +52,24 @@ class TASLock{
 class TTASLock{
     public:
     void lock(){
+        int backOff = 1;
         while(true){
             while(locked_.load()){
-                continue;
+                __builtin_ia32_pause();
             }
             bool result = locked_.exchange(true);
 
             if(!result){
                 break;
             }
+            
+            for(int i = 0; i < backOff; i++){
+                __builtin_ia32_pause();
+            }
+
+            if(backOff < MAX_BACKOFF){
+                backOff*=2;
+            };
         }
     };
     void unlock(){
@@ -69,6 +78,7 @@ class TTASLock{
 
     private:
         std::atomic <bool> locked_{false};
+        const int MAX_BACKOFF = 64;
 };
 
 
