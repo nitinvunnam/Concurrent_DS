@@ -1,0 +1,42 @@
+c208-007[clx](146)$ make sweep IMPLS=sharded:mutex SHARDS=256
+g++ -std=c++20 -O2 -Wall -Wextra -pthread -o bench bench.cpp
+# ./bench sharded:mutex shards=256 mix=80/10/10 writers=0
+# cores=56 hwthreads=56 sockets=2 cores/socket=28 pin order: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55
+T=1         3.0 Mops/s  (3.0 3.0 3.0)
+T=2         3.0 Mops/s  (3.0 2.8 3.7)
+T=4         6.3 Mops/s  (6.6 6.3 6.3)
+T=8        11.8 Mops/s  (11.8 11.8 11.5)
+T=16       22.1 Mops/s  (20.6 22.1 22.2)
+T=28       33.4 Mops/s  (33.3 33.4 33.5)  <- first socket full
+T=40       42.3 Mops/s  (42.3 42.3 42.3)
+T=56       51.7 Mops/s  (51.7 51.9 51.7)  <- every core busy
+T=84       50.8 Mops/s  (50.8 50.6 50.8)  <- oversubscribed
+T=112      50.6 Mops/s  (50.8 50.4 50.6)  <- oversubscribed
+wrote sharded_mutex.csv
+c208-007[clx](147)$ for n in 16 64 256 1024 4096; do
+>     ./bench sharded:mutex 32 $n
+> done
+warm-up 128 ms
+sharded:mutex  T=32  shards=16   mix=80/10/10     18287616 ops    2003 ms      9.1 Mops/s
+warm-up 124 ms
+sharded:mutex  T=32  shards=64   mix=80/10/10     41549824 ops    2002 ms     20.8 Mops/s
+warm-up 117 ms
+sharded:mutex  T=32  shards=256  mix=80/10/10     77521920 ops    2002 ms     38.7 Mops/s
+warm-up 106 ms
+sharded:mutex  T=32  shards=1024 mix=80/10/10    115444736 ops    2002 ms     57.7 Mops/s
+warm-up 93 ms
+sharded:mutex  T=32  shards=4096 mix=80/10/10    157067264 ops    2001 ms     78.5 Mops/s
+c208-007[clx](148)$ for n in 16 64 256 1024 4096; do
+>     ./bench sharded:mutex 1 $n
+> done
+warm-up 131 ms
+sharded:mutex  T=1   shards=16   mix=80/10/10      5210112 ops    2000 ms      2.6 Mops/s
+warm-up 125 ms
+sharded:mutex  T=1   shards=64   mix=80/10/10      5596160 ops    2000 ms      2.8 Mops/s
+warm-up 116 ms
+sharded:mutex  T=1   shards=256  mix=80/10/10      5955584 ops    2000 ms      3.0 Mops/s
+warm-up 106 ms
+sharded:mutex  T=1   shards=1024 mix=80/10/10      6165504 ops    2000 ms      3.1 Mops/s
+warm-up 91 ms
+sharded:mutex  T=1   shards=4096 mix=80/10/10      7121920 ops    2000 ms      3.6 Mops/s
+c208-007[clx](149)$
