@@ -50,7 +50,7 @@ class CoarseMap{
             return inserted;
         };   // true if key was new
 
-        bool find  (const K& key, V& out) const{
+        bool find(const K& key, V& out) const{
             std::lock_guard<std::mutex> guard(mutex_);
 
             auto it = map_.find(key);
@@ -78,5 +78,59 @@ class CoarseMap{
         };
 };
 
+template <typename K, typename V, class Lock = std::mutex, bool Padded = true>
+    requires BasicLock<Lock>
+class ShardedMap{
+    private:
+        struct Shard{
+            std::map<K,V> map;
+            mutable Lock lock;
+        };
+        std::vector<Shard> shards;
+    public:
+        explicit ShardedMap(std::size_t nshards)
+            :shards(nshards)
+        {
+        };
+        std::size_t shard_count() const{
+            return shards.size();
+        };
+        bool insert(const K& key, const V& value){
+            std::size_t index = std::hash<K>{}(key) % shards.size();
+            std::lock_guard<Lock> guard(shards[index].lock);
+            auto [it, inserted] = shards[index].map.insert({key, value});
+            it->second = value;
+            return inserted;
+        };// true if key was new
+
+        bool find  (const K& key, V& out) const{
+            std::size_t index = std::hash<K>{}(key) % shards.size();
+            std::lock_guard<Lock> guard(shards[index].lock);
+            auto it = shards[index].map.find(key);
+
+            if(it == shards[index].map.end()){
+                return false;
+            }
+
+            out = it->second;
+            return true;
+        };     // copy; false if absent
+
+        bool erase (const K& key){
+            std::size_t index = std::hash<K>{}(key) % shards.size();
+            std::lock_guard<Lock> guard(shards[index].lock);
+
+            if (shards[index].map.erase(key)){
+                return true;
+            }
+            return false;
+        };                   // true if was present
+        std::size_t size() const{
+            std::size_t index = std::hash<K>{}(key) % shards.size();
+            std::lock_guard<Lock> guard(shards[index].lock);
+
+            return shards[index].map.size();
+        };        
+};// Part 4
 
 #endif /* CONCURRENT_MAP_H */
