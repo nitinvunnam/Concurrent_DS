@@ -13,8 +13,12 @@ plt.axvline(56, linestyle="--", alpha=0.6, label="Core count (56)")
 
 plt.xlabel("Thread Count")
 plt.ylabel("Throughput (Mops/s)")
-plt.title("CoarseMap Throughput vs. Thread Count")
+#plt.title("CoarseMap Throughput vs. Thread Count")
 plt.xticks(df["threads"])
+
+plt.ylim(bottom=0)
+plt.xticks(df["threads"], rotation=30)
+plt.title("CoarseMap Throughput Scaling on Frontera")
 
 plt.grid(alpha=0.25)
 plt.legend()

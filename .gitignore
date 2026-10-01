@@ -26,3 +26,10 @@ bin/
 
 # Generated benchmark outputs, ONLY if you don't want them committed
 # *.csv
+
+starter_files/bench
+starter_files/test_map
+starter_files/test_map_tsan
+starter_files/test_locks
+starter_files/test_locks_tsan
+.venv
